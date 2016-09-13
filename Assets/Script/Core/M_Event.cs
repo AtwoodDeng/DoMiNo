@@ -13,6 +13,15 @@ public class M_Event : MonoBehaviour {
 	public static event EventHandler StartApp;
 	public static void FireStartApp(BasicArg arg){if ( StartApp != null ) StartApp(arg) ; }
 
+	public delegate void MsgHandler(MsgArg arg);
+
+	public static event MsgHandler StartRunning;
+	public static void FireStartRunning(MsgArg arg) { if ( StartRunning != null ) StartRunning(arg); }
+
+
+	public static event MsgHandler EndRunning;
+	public static void FireEndRunning(MsgArg arg) { if ( EndRunning != null ) EndRunning(arg); }
+
 }
 
 public class BasicArg : EventArgs
