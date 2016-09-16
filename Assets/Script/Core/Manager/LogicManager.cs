@@ -51,6 +51,7 @@ public class LogicManager : MonoBehaviour {
 
 	void M_Event_InputCancle (InputArg arg)
 	{
+		Debug.Log ("Cancle");
 		switch (mode) {
 		case EditMode.Editting:
 			break;
@@ -78,6 +79,7 @@ public class LogicManager : MonoBehaviour {
 
 	void M_Event_EditCancle (MsgArg arg)
 	{
+		
 		if (m_mode == EditMode.Adding) {
 			m_mode = EditMode.Editting;
 		}
@@ -88,6 +90,8 @@ public class LogicManager : MonoBehaviour {
 		switch (mode) {
 		case EditMode.Editting:
 		case EditMode.Adding:
+		case EditMode.Runing:
+			// rotate the camera
 			CameraControl.Instance.RotateCameraByScreen (arg.offset * sensity.motionSensity , true);
 			break;
 		default:
@@ -100,6 +104,8 @@ public class LogicManager : MonoBehaviour {
 	{
 		switch (mode) {
 		case EditMode.Editting:
+		case EditMode.Runing:
+			// move the camera
 			CameraControl.Instance.SetCameraTargetScreen( arg.offset * sensity.subMotionSensity , true  );
 			break;
 		default:
@@ -122,6 +128,7 @@ public class LogicManager : MonoBehaviour {
 		switch (mode) {
 		case EditMode.Editting:
 		case EditMode.Adding:
+		case EditMode.Runing:
 			CameraControl.Instance.ChangeSize (arg.delta * sensity.pinchSensity);
 			break;
 		default:

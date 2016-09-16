@@ -8,6 +8,7 @@ public class Unit : MonoBehaviour {
 		None,
 		Editting,
 		Settled,
+		Preparing,
 		Running,
 	}
 	public State state;
@@ -25,6 +26,16 @@ public class Unit : MonoBehaviour {
 	virtual public void OnEnable()
 	{
 		M_Event.EditCancle += M_Event_EditCancle;
+		M_Event.StartRunning += M_Event_StartRunning;
+	}
+
+	void M_Event_StartRunning (MsgArg arg)
+	{
+		if (state == State.Editting)
+			GameObject.Destroy (gameObject);
+		else {
+			state = State.Preparing;
+		}
 	}
 
 	void M_Event_EditCancle (MsgArg arg)

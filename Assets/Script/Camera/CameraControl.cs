@@ -77,7 +77,7 @@ public class CameraControl : MonoBehaviour {
 
 	public void ChangeSize( float deltaSize)
 	{
-		Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView * ( 1f + deltaSize) ,  15f , 100f );
+		Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView * ( 1f + deltaSize) ,  20f , 100f );
 
 	}
 
