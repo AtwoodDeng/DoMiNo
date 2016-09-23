@@ -1,122 +1,126 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
-public class InputManager : MonoBehaviour {
+public class InputManager : MBehavior {
 
 	public InputManager() { s_Instance = this; }
 	public static InputManager Instance { get { return s_Instance; } }
 	private static InputManager s_Instance;
 
-	delegate void FuncHandler(); 
-	Dictionary<KeyCode,FuncHandler> keyBlendDict = new Dictionary<KeyCode, FuncHandler>();
-
-	Vector2 m_ScreenPos;
-
-	void Start()
+	protected override void MAwake ()
 	{
-		keyBlendDict.Add(KeyCode.Space,StartRunning );
-		keyBlendDict.Add(KeyCode.Escape,Cancle);
-
-		m_ScreenPos = Global.Vector2Infinity;
+		base.MAwake ();
+		if (s_Instance == null)
+			s_Instance = this;
 	}
 
-	void Update()
+	/// <summary>
+	/// Gets the position of focus point on the screen .
+	/// </summary>
+	/// <returns><c>true</c>, if screen position was gotten, <c>false</c> otherwise.</returns>
+	/// <param name="screenPos">the position of the screen point.</param>
+	public virtual bool GetScreenPos( out Vector2 screenPos )
 	{
-		foreach( KeyCode k in keyBlendDict.Keys )
-		{
-			if ( Input.GetKeyDown( k ) )
-			{
-				keyBlendDict[k].Invoke();
-			}
-		}
-	}
-	void Cancle()
-	{
-		
-		InputArg arg = new InputArg (this);
-		arg.type = InputArg.InputType.None;
-		M_Event.FireInputCancle (arg);
+		screenPos = Vector2.zero;
+		return false;
 	}
 
-	void StartRunning()
-	{
-		MsgArg arg = new MsgArg(this);
-		M_Event.FireStartRunning(arg);
-	}
-
-	void OnFingerDown(FingerDownEvent e )
-	{
-		if (Application.isMobilePlatform || Input.GetMouseButtonDown (0)) {
-			InputArg arg = new InputArg (this);
-			arg.type = InputArg.InputType.Down;
-			arg.screenPos = e.Position;
-			arg.e = e;
-
-			M_Event.FireInputDown (arg);
-		}
-
-	}
-
-	void OnFingerMove( FingerMotionEvent e )
+	/// <summary>
+	/// Sends the cancle event .
+	/// </summary>
+	protected void SendCancle()
 	{
 		InputArg arg = new InputArg (this);
-		arg.type = InputArg.InputType.None;
-		if ( Application.isMobilePlatform ) {
-			if (Input.touches.Length > 1)
-				arg.type = InputArg.InputType.SubMotion;
-			else
-				arg.type = InputArg.InputType.Motion;
-		} else {
-			if (Input.GetMouseButton (1)) // right button
-				arg.type = InputArg.InputType.SubMotion;
-			else if (Input.GetMouseButton (0)) // left button
-				arg.type = InputArg.InputType.Motion;
-		}
-		arg.screenPos = e.Position;
-		arg.offset = e.Finger.DeltaPosition;
-		arg.e = e;
-
-		if ( arg.type == InputArg.InputType.Motion )
-			M_Event.FireInputMotion (arg);
-		if (arg.type == InputArg.InputType.SubMotion)
-			M_Event.FireInputSubMotion (arg);	
-
-		if (e.Phase == FingerMotionPhase.Updated)
-			m_ScreenPos = e.Position;
-		else if (e.Phase == FingerMotionPhase.Ended)
-			m_ScreenPos = Global.Vector2Infinity;
+		arg.type = MInputType.Cancle;
+		M_Event.FireInput (arg);
 	}
 
-	void OnTwist( TwistGesture g )
+	/// <summary>
+	/// Sends the start running event.
+	/// </summary>
+	protected void SendStartRunning()
 	{
 		InputArg arg = new InputArg (this);
-		arg.type = InputArg.InputType.Twist;
-		arg.delta = g.DeltaRotation;
-		arg.g = g;
-
-		M_Event.FireInputTwist (arg);
-		
+		arg.type = MInputType.Start;
+		M_Event.FireInput (arg);
 	}
 
-	void OnPinch( PinchGesture g )
+	/// <summary>
+	/// Sends down event.
+	/// </summary>
+	/// <param name="e">E the down event </param>
+	protected void SendDown( Vector2 pos )
 	{
-		Debug.Log ("OnPinch");
 		InputArg arg = new InputArg (this);
-		arg.type = InputArg.InputType.Pinch;
-		arg.delta = g.Delta;
-		arg.g = g;
+		arg.type = MInputType.MainButtonDown;
+		arg.screenPos = pos;
 
-		M_Event.FireInputPinch (arg);
+		M_Event.FireInput ( arg);
 	}
 
-	public Vector2 GetScreenPosition()
+	/// <summary>
+	/// Sends up event.
+	/// </summary>
+	/// <param name="pos">Position.</param>
+	protected void SendUp( Vector2 pos )
 	{
-		if (Application.isMobilePlatform)
-			return m_ScreenPos;
-	
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.MainButtonUp;
+		arg.screenPos = pos;
 
-		return Input.mousePosition;
+		Debug.Log ("Send Up");
+		M_Event.FireInput ( arg);
 	}
 
+	/// <summary>
+	/// Sends the motion event.
+	/// </summary>
+	/// <param name="e">E.</param>
+	protected void SendMotion( Vector2 pos , Vector2 offset , InputArg.State state )
+	{
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.Motion;
+		arg.screenPos = pos;
+		arg.offset = offset;
+		arg.state = state;
+
+		M_Event.FireInput (  arg);
+	}
+
+	/// <summary>
+	/// Sends the sub motion event.
+	/// </summary>
+	/// <param name="e">E.</param>
+	protected void SendSpin( Vector2 pos , Vector2 offset , InputArg.State state )
+	{
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.Spin;
+		arg.screenPos = pos;
+		arg.offset = offset;
+
+
+		M_Event.FireInput ( arg);
+	}
+
+	/// <summary>
+	/// Sends the spin event.
+	/// </summary>
+	protected void SendZoom( float delta )
+	{
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.Zoom;
+		arg.delta = delta;
+
+		M_Event.FireInput (arg);
+	}
+
+
+	/// <summary>
+	/// (Not recommend) Send a input event through a custom arg
+	/// </summary>
+	/// <param name="arg">Argument.</param>
+	protected void SendEvent( InputArg arg )
+	{
+		M_Event.FireInput (arg);
+	}
 }

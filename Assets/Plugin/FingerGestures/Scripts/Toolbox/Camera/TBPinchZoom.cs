@@ -64,7 +64,7 @@ public class TBPinchZoom : MonoBehaviour
                     if( GetComponent<Camera>().orthographic )
                         GetComponent<Camera>().orthographicSize = Mathf.Max( defaultOrthoSize - zoomAmount, 0.1f );
                     else
-                        GetComponent<Camera>().fov = Mathf.Max( defaultFov - zoomAmount, 0.1f );
+					GetComponent<Camera>().fieldOfView = Mathf.Max( defaultFov - zoomAmount, 0.1f );
                     break;
             }
         }
@@ -89,7 +89,7 @@ public class TBPinchZoom : MonoBehaviour
     public void SetDefaults()
     {
         DefaultPos = transform.position;
-        DefaultFov = GetComponent<Camera>().fov;
+		DefaultFov = GetComponent<Camera>().fieldOfView;
         DefaultOrthoSize = GetComponent<Camera>().orthographicSize;
     }
 

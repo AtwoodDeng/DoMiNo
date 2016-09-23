@@ -7,6 +7,8 @@ public class LogicManager : MonoBehaviour {
 	public LogicManager() { s_Instance = this; }
 	public static LogicManager Instance { get { return s_Instance; } }
 	private static LogicManager s_Instance;
+
+	private InputManager inputManager;
 		
 	public enum EditMode
 	{
@@ -29,9 +31,25 @@ public class LogicManager : MonoBehaviour {
 		[Range(0,0.1f)]
 		public float subMotionSensity;
 		[Range(0,0.02f)]
-		public float pinchSensity;
+		public float spinSensity;
 	}
 	[SerializeField] Sensity sensity;
+
+
+
+	void Awake()
+	{
+		InitManager ();
+	}
+
+	void InitManager()
+	{
+		if (Application.isMobilePlatform) {
+			gameObject.AddComponent<InputManagerMobile> ();
+		} else {
+			gameObject.AddComponent<InputManagerPC> ();
+		}
+	}
 
 	void OnEnable()
 	{
@@ -39,19 +57,50 @@ public class LogicManager : MonoBehaviour {
 		M_Event.EndRunning += M_Event_EndRunning;
 		M_Event.StartAdding += M_Event_StartAdding;
 		M_Event.EditCancle += M_Event_EditCancle;
+		M_Event.UnitSettled += M_Event_UnitSettled;
 
-		M_Event.InputMotion += M_Event_InputMotion;
-		M_Event.InputSubMotion += M_Event_InputSubMotion;
-		M_Event.InputDown += M_Event_InputDown;
-		M_Event.InputPinch += M_Event_InputPinch;
-		M_Event.InputTwist += M_Event_InputTwist;
-		M_Event.InputCancle += M_Event_InputCancle;
+		M_Event.inputEvents [(int)MInputType.Motion] += M_Event_InputMotion;
+		M_Event.inputEvents [(int)MInputType.Spin] += M_Event_InputSpin;
+		M_Event.inputEvents [(int)MInputType.MainButtonDown] += M_Event_InputMainButtonDown;
+		M_Event.inputEvents [(int)MInputType.MainButtonUp] += M_Event_InputMainButtonUp;
+		M_Event.inputEvents [(int)MInputType.Zoom] += M_Event_InputZoom;
+		M_Event.inputEvents [(int)MInputType.Cancle] += M_Event_InputCancle;
+		M_Event.inputEvents [(int)MInputType.Start] += M_Event_InputStart;
 
+//		M_Event.InputMotion += M_Event_InputMotion;
+//		M_Event.InputSubMotion += M_Event_InputSubMotion;
+//		M_Event.InputDown += M_Event_InputDown;
+//		M_Event.InputSpin += M_Event_InputSpin;
+//		M_Event.InputTwist += M_Event_InputTwist;
+//		M_Event.InputCancle += M_Event_InputCancle;
+
+	}
+
+	void M_Event_UnitSettled (MsgArg arg)
+	{
+		if ( mode == EditMode.Adding) {
+			UnitWindow.Instance.AddNextUnit ( (Unit)arg.sender);
+		}
+	}
+
+	void M_Event_InputMainButtonUp( InputArg arg )
+	{
+		// do nothing
+	}
+
+	void M_Event_InputStart( InputArg arg )
+	{
+		switch (mode) {
+		case EditMode.Editting:
+		case EditMode.Adding:
+			MsgArg msg = new MsgArg (this);
+			M_Event.FireStartRunning (msg );
+			break;
+		}
 	}
 
 	void M_Event_InputCancle (InputArg arg)
 	{
-		Debug.Log ("Cancle");
 		switch (mode) {
 		case EditMode.Editting:
 			break;
@@ -85,14 +134,14 @@ public class LogicManager : MonoBehaviour {
 		}
 	}
 
-	void M_Event_InputSubMotion (InputArg arg)
+	void M_Event_InputSpin (InputArg arg)
 	{
 		switch (mode) {
 		case EditMode.Editting:
 		case EditMode.Adding:
 		case EditMode.Runing:
 			// rotate the camera
-			CameraControl.Instance.RotateCameraByScreen (arg.offset * sensity.motionSensity , true);
+			CameraControl.Instance.RotateCameraByScreenOffset (arg.offset * sensity.subMotionSensity , true);
 			break;
 		default:
 			break;
@@ -106,44 +155,32 @@ public class LogicManager : MonoBehaviour {
 		case EditMode.Editting:
 		case EditMode.Runing:
 			// move the camera
-			CameraControl.Instance.SetCameraTargetScreen( arg.offset * sensity.subMotionSensity , true  );
+			CameraControl.Instance.MoveCameraPositionByScreenOffset( arg.offset * sensity.motionSensity , true  );
 			break;
 		default:
 			break;
 		};
 	}
 
-	void M_Event_InputTwist (InputArg arg)
-	{
-		switch (mode) {
-		case EditMode.Editting:
-			break;
-		default:
-			break;
-		}
-	}
-
-	void M_Event_InputPinch (InputArg arg)
+	void M_Event_InputZoom (InputArg arg)
 	{
 		switch (mode) {
 		case EditMode.Editting:
 		case EditMode.Adding:
 		case EditMode.Runing:
-			CameraControl.Instance.ChangeSize (arg.delta * sensity.pinchSensity);
+			CameraControl.Instance.ChangeFieldOfView (arg.delta * sensity.spinSensity);
 			break;
 		default:
 			break;
 		}
 	}
 
-	void M_Event_InputDown (InputArg arg)
+	void M_Event_InputMainButtonDown (InputArg arg)
 	{
 		switch (mode) {
 		case EditMode.Editting:
 			break;
 		case EditMode.Adding:
-			Unit.EdittingUnit.Confirm ();
-			UnitWindow.Instance.AddLastUnit ();
 			break;
 		default:
 			break;
@@ -170,12 +207,19 @@ public class LogicManager : MonoBehaviour {
 		M_Event.StartAdding -= M_Event_StartAdding;
 		M_Event.EditCancle -= M_Event_EditCancle;
 
-		M_Event.InputMotion -= M_Event_InputMotion;
-		M_Event.InputSubMotion -= M_Event_InputSubMotion;
-		M_Event.InputDown -= M_Event_InputDown;
-		M_Event.InputPinch -= M_Event_InputPinch;
-		M_Event.InputTwist -= M_Event_InputTwist;
-		M_Event.InputCancle -= M_Event_InputCancle;
+		M_Event.inputEvents [(int)MInputType.Motion] -= M_Event_InputMotion;
+		M_Event.inputEvents [(int)MInputType.Spin] -= M_Event_InputSpin;
+		M_Event.inputEvents [(int)MInputType.MainButtonDown] -= M_Event_InputMainButtonDown;
+		M_Event.inputEvents [(int)MInputType.Zoom] -= M_Event_InputZoom;
+		M_Event.inputEvents [(int)MInputType.Cancle] -= M_Event_InputCancle;
+		M_Event.inputEvents [(int)MInputType.Start] -= M_Event_InputStart;
+
+//		M_Event.InputMotion -= M_Event_InputMotion;
+//		M_Event.InputSubMotion -= M_Event_InputSubMotion;
+//		M_Event.InputDown -= M_Event_InputDown;
+//		M_Event.InputSpin -= M_Event_InputSpin;
+//		M_Event.InputTwist -= M_Event_InputTwist;
+//		M_Event.InputCancle -= M_Event_InputCancle;
 	}
 
 

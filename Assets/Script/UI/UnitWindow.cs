@@ -19,18 +19,27 @@ public class UnitWindow : MonoBehaviour {
 
 	GameObject lastUnitPrefab;
 
-	public void AddLastUnit()
+	public void AddNextUnit( Unit lastUnit )
 	{
-		OnAddUnit (lastUnitPrefab);
+		if (lastUnit != null)
+			OnAddUnit (lastUnitPrefab, lastUnit.transform.rotation);
+		else
+			OnAddUnit (lastUnitPrefab, Quaternion.identity);
 	}
 
-	public void OnAddUnit( GameObject unitPrefab )
+	public void OnAddUnit( GameObject unitPrefab)
+	{
+		OnAddUnit (unitPrefab, Quaternion.identity); 
+	}
+
+	public void OnAddUnit( GameObject unitPrefab , Quaternion lastUnitRotation )
 	{
 		lastUnitPrefab = unitPrefab;
 		MsgArg msg = new MsgArg (this);
 		M_Event.FireStartAdding (msg);
 
 		GameObject obj = Instantiate (unitPrefab) as GameObject;
+		obj.transform.rotation = lastUnitRotation;
 
 		Unit unit = obj.GetComponent<Unit> ();
 		unit.StartEditting ();
