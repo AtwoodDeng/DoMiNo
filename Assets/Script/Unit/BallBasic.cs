@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BallBasic : Unit {
+public class BallBasic : EditableUnit {
 
 }

@@ -68,7 +68,6 @@ public class InputManager : MBehavior {
 		arg.type = MInputType.MainButtonUp;
 		arg.screenPos = pos;
 
-		Debug.Log ("Send Up");
 		M_Event.FireInput ( arg);
 	}
 

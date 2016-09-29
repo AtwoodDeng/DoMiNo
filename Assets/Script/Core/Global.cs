@@ -10,7 +10,10 @@ public class Global {
 
 	static public Transform world{
 		get{
-			return GameObject.Find ("DWorld").transform;
+			GameObject world = GameObject.Find ("DWorld");
+			if ( world == null )
+				world = new GameObject("DWorld");
+			return world.transform;
 		}
 	}
 }

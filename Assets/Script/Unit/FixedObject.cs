@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FixedObject : Unit {
+public class FixedObject : EditableUnit {
 
 	public override void Confirm ()
 	{

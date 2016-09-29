@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DominoBasic : Unit {
+public class DominoBasic : EditableUnit {
 
 }

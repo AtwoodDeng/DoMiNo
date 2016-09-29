@@ -41,7 +41,7 @@ public class UnitWindow : MonoBehaviour {
 		GameObject obj = Instantiate (unitPrefab) as GameObject;
 		obj.transform.rotation = lastUnitRotation;
 
-		Unit unit = obj.GetComponent<Unit> ();
+		EditableUnit unit = obj.GetComponent<EditableUnit> ();
 		unit.StartEditting ();
 	}
 }

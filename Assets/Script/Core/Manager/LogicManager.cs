@@ -225,6 +225,9 @@ public class LogicManager : MonoBehaviour {
 
 	void OnGUI()
 	{
-		GUILayout.Label ("Mode " + mode);
+		GUIStyle style = new GUIStyle();
+		style.fontSize = 40;
+		style.normal.textColor = Color.blue;
+		GUILayout.Label ("Mode " + mode , style );
 	}
 }

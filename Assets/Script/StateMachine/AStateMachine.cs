@@ -14,7 +14,7 @@ public class AStateMachine<T> where T : IFormattable , IConvertible , IComparabl
 		}
 		set {
 			if ( !value.Equals(m_state) && enable) {
-				Debug.Log ("From " + m_state.ToString () + " to " + value);
+//				Debug.Log ("From " + m_state.ToString () + " to " + value);
 				if ( exitState.ContainsKey(m_state) && exitState [m_state] != null )
 					exitState [m_state]();
 				

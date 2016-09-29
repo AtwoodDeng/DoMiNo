@@ -2,13 +2,18 @@
 using System.Collections;
 using DG.Tweening;
 
-public class Starter : MonoBehaviour {
+public class Starter : Unit {
 	[SerializeField] Vector3 pushDirection;
 	[SerializeField] float pushDuration = 0.5f;
 
 	void OnEnable()
 	{
 		M_Event.StartRunning += M_Event_StartRunning;
+	}
+
+	void OnDisable()
+	{
+		M_Event.StartRunning -= M_Event_StartRunning;
 	}
 
 	void M_Event_StartRunning (MsgArg arg)
