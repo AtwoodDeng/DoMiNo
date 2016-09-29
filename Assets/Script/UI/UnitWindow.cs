@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class UnitWindow : MonoBehaviour {
+public class UnitWindow : MWindow {
 
 	public UnitWindow() { s_Instance = this; }
 	public static UnitWindow Instance { get { return s_Instance; } }
@@ -35,13 +35,17 @@ public class UnitWindow : MonoBehaviour {
 	public void OnAddUnit( GameObject unitPrefab , Quaternion lastUnitRotation )
 	{
 		lastUnitPrefab = unitPrefab;
-		MsgArg msg = new MsgArg (this);
-		M_Event.FireStartAdding (msg);
 
 		GameObject obj = Instantiate (unitPrefab) as GameObject;
 		obj.transform.rotation = lastUnitRotation;
 
 		EditableUnit unit = obj.GetComponent<EditableUnit> ();
+
+		WindowArg msg = new WindowArg (this);
+		msg.unit = unit;
+	
+		M_Event.FireWindowEvent (MWindowEvent.AddUnit, msg);
+
 		unit.StartEditting ();
 	}
 }

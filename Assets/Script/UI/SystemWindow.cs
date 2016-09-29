@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEditor;
 
-public class SystemWindow : MonoBehaviour {
+public class SystemWindow : MWindow {
 
 	public void Save()
 	{

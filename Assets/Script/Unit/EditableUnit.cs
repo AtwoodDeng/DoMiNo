@@ -65,8 +65,8 @@ public class EditableUnit : Unit {
 
 	virtual public void OnEnable()
 	{
-		M_Event.EditCancle += M_Event_EditCancle;
-		M_Event.StartRunning += M_Event_StartRunning;
+		M_Event.editorEvents[(int)MEditorEvent.EditCancle]  += M_Event_EditCancle;
+		M_Event.editorEvents[(int)MEditorEvent.StartRunning] += M_Event_StartRunning;
 
 		for (int i = 0; i < System.Enum.GetNames (typeof(MInputType)).Length; ++i) {
 			M_Event.inputEvents [i] += OnInput;
@@ -178,7 +178,7 @@ public class EditableUnit : Unit {
 			m_rigidbody.isKinematic = false;
 		}
 
-		M_Event.FireUnitSettled (new MsgArg (this));
+		M_Event.FireObjectEvent(MObjectEvent.UnitSettled , new ObjArg (this));
 	}
 
 	virtual protected void UpdateSettled()
@@ -204,8 +204,8 @@ public class EditableUnit : Unit {
 
 	virtual public void OnDisable()
 	{
-		M_Event.StartRunning -= M_Event_StartRunning;
-		M_Event.EditCancle -= M_Event_EditCancle;
+		M_Event.editorEvents[(int)MEditorEvent.StartRunning] -= M_Event_StartRunning;
+		M_Event.editorEvents[(int)MEditorEvent.EditCancle] -= M_Event_EditCancle;
 
 		for (int i = 0; i < System.Enum.GetNames (typeof(MInputType)).Length; ++i) {
 			M_Event.inputEvents [i] -= OnInput;

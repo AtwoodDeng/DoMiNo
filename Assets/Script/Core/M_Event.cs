@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-
+/// <summary>
+/// enum of input type
+/// </summary>
 public enum MInputType
 {
 	None,
@@ -16,6 +18,10 @@ public enum MInputType
 	Start,
 }
 
+/// <summary>
+/// enum of editor event
+/// the event send by manager
+/// </summary>
 public enum MEditorEvent
 {
 	None,
@@ -23,6 +29,26 @@ public enum MEditorEvent
 	EndRunning,
 	StartAdding,
 	EditCancle,
+}
+
+/// <summary>
+/// enum of window event
+/// the event send by window 
+/// </summary>
+public enum MWindowEvent
+{
+	None,
+	AddUnit,
+	SettleUnit,
+}
+
+/// <summary>
+/// enum of object event
+/// event send by units
+/// </summary>
+public enum MObjectEvent
+{
+	None,
 	UnitSettled,
 }
 
@@ -41,24 +67,6 @@ public class M_Event : MonoBehaviour {
 	/// </summary>
 	public delegate void MsgHandler(MsgArg arg);
 
-	public static event MsgHandler StartRunning;
-	public static void FireStartRunning(MsgArg arg) { if ( StartRunning != null ) StartRunning(arg); }
-
-	public static event MsgHandler EndRunning;
-	public static void FireEndRunning(MsgArg arg) { if ( EndRunning != null ) EndRunning(arg); }
-
-	public static event MsgHandler StartAdding;
-	public static void FireStartAdding(MsgArg arg) { if ( StartAdding != null ) StartAdding(arg); }
-
-	public static event MsgHandler EditCancle;
-	public static void FireEditCancle(MsgArg  arg) { if ( EditCancle != null ) EditCancle(arg); }
-
-	public static event MsgHandler UnitSettled;
-	public static void FireUnitSettled(MsgArg  arg) { if ( UnitSettled != null ) UnitSettled(arg); }
-
-	/// <summary>
-	/// Editor events
-	/// </summary>
 	public delegate void EditorHandler(EditorArg arg );
 	public static EditorHandler[] editorEvents = new EditorHandler[System.Enum.GetNames (typeof(MEditorEvent)).Length];
 	public static void FireEditorEvent (EditorArg arg)
@@ -72,6 +80,41 @@ public class M_Event : MonoBehaviour {
 		if (editorEvents [(int)type] != null) {
 			arg.type = type;
 			editorEvents [(int)type] (arg);
+		}
+	}
+
+	/// <summary>
+	/// Editor events
+	/// </summary>
+	public delegate void WindowHandler(WindowArg arg );
+	public static WindowHandler[] windowEvents = new WindowHandler[System.Enum.GetNames (typeof(MWindowEvent)).Length];
+	public static void FireWindowEvent (WindowArg arg)
+	{
+		if ( arg.type != MWindowEvent.None ) {
+			FireWindowEvent (arg.type, arg);
+		}
+	}
+	public static void FireWindowEvent( MWindowEvent type , WindowArg arg )
+	{
+		if (windowEvents [(int)type] != null) {
+			arg.type = type;
+			windowEvents [(int)type] (arg);
+		}
+	}
+
+	public delegate void ObjectHandler(ObjArg arg );
+	public static ObjectHandler[] objectEvents = new ObjectHandler[System.Enum.GetNames (typeof(MObjectEvent)).Length];
+	public static void FireObjectEvent (ObjArg arg)
+	{
+		if ( arg.type != MObjectEvent.None ) {
+			FireObjectEvent (arg.type, arg);
+		}
+	}
+	public static void FireObjectEvent( MObjectEvent type , ObjArg arg )
+	{
+		if (objectEvents [(int)type] != null) {
+			arg.type = type;
+			objectEvents [(int)type] (arg);
 		}
 	}
 
@@ -211,9 +254,48 @@ public class InputArg : BasicArg
 	
 }
 
+/// <summary>
+/// Editor event argument.
+/// </summary>
 public class EditorArg : MsgArg
 {
 	public EditorArg(object _this):base(_this){}
 
+	/// <summary>
+	/// The type.
+	/// </summary>
 	public MEditorEvent type;
+}
+
+/// <summary>
+/// Window event argument.
+/// </summary>
+public class WindowArg : BasicArg
+{
+	public WindowArg(object _this ):base(_this){
+		if ( _this is MWindow )
+			sendWindow = (MWindow)_this;
+	}
+
+	/// <summary>
+	/// The window send this message
+	/// </summary>
+	public MWindow sendWindow;
+	/// <summary>
+	/// The type.
+	/// </summary>
+	public MWindowEvent type;
+
+	/// <summary>
+	/// the reference unit
+	/// </summary>
+	public Unit unit;
+
+}
+
+public class ObjArg : MsgArg
+{
+	public ObjArg(object _this ):base(_this){}
+
+	public MObjectEvent type;
 }

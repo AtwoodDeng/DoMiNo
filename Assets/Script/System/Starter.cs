@@ -8,12 +8,12 @@ public class Starter : Unit {
 
 	void OnEnable()
 	{
-		M_Event.StartRunning += M_Event_StartRunning;
+		M_Event.editorEvents[(int)MEditorEvent.StartRunning] += M_Event_StartRunning;
 	}
 
 	void OnDisable()
 	{
-		M_Event.StartRunning -= M_Event_StartRunning;
+		M_Event.editorEvents[(int)MEditorEvent.StartRunning] -= M_Event_StartRunning;
 	}
 
 	void M_Event_StartRunning (MsgArg arg)
