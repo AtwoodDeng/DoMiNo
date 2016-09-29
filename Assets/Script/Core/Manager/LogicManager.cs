@@ -16,6 +16,8 @@ public class LogicManager : MBehavior
 
 	private InputManager inputManager;
 
+	private HistoryManager historyManager;
+
 	public enum EditMode
 	{
 		None,
@@ -36,12 +38,12 @@ public class LogicManager : MBehavior
 	[System.Serializable]
 	public struct Sensity
 	{
-		[Range (0, 1f)]
+		[Range (0, 0.1f)]
 		public float motionSensity;
 		[Range (0, 0.1f)]
-		public float subMotionSensity;
-		[Range (0, 0.02f)]
-		public float spinSensity;
+		public float SpinSensity;
+		[Range (0, 0.1f)]
+		public float ZoomSensity;
 	}
 
 	[SerializeField] Sensity sensity;
@@ -51,16 +53,22 @@ public class LogicManager : MBehavior
 	protected override void MAwake ()
 	{
 		InitManager ();
+		InitStateMachine ();
 	}
 
 	void InitManager ()
 	{
 		if (Application.isMobilePlatform) {
-			gameObject.AddComponent<InputManagerMobile> ();
+			inputManager = gameObject.AddComponent<InputManagerMobile> ();
 		} else {
-			gameObject.AddComponent<InputManagerPC> ();
+			inputManager = gameObject.AddComponent<InputManagerPC> ();
 		}
 
+		historyManager = gameObject.AddComponent<HistoryManager> ();
+	}
+
+	void InitStateMachine()
+	{
 		m_stateMachine = new AStateMachine<EditMode>();
 
 		m_stateMachine.AddEnter (EditMode.Editting, EnterEditting);
@@ -87,6 +95,14 @@ public class LogicManager : MBehavior
 		windowFeedback[(int)MWindowEvent.AddUnit] += delegate(WindowArg arg) {
 			m_stateMachine.State = EditMode.Adding;
 		};
+
+		inputFeedback [(int)MInputType.Undo] += delegate(InputArg arg) {
+			HistoryManager.Instance.Undo ();
+		};
+
+		inputFeedback [(int)MInputType.Redo] += delegate(InputArg arg) {
+			HistoryManager.Instance.Redo ();
+		};
 	}
 
 	void UpdateEditting ()
@@ -96,6 +112,8 @@ public class LogicManager : MBehavior
 	void ExitEditting ()
 	{
 		inputFeedback[(int)MInputType.Start] = null;
+		inputFeedback [(int)MInputType.Undo] = null;
+		inputFeedback [(int)MInputType.Redo] = null;
 		windowFeedback[(int)MWindowEvent.AddUnit] = null;
 	}
 
@@ -113,9 +131,18 @@ public class LogicManager : MBehavior
 			m_stateMachine.State = EditMode.Editting;
 		};
 
+		inputFeedback [(int)MInputType.Undo] += delegate(InputArg arg) {
+			HistoryManager.Instance.Undo ();
+		};
+
+		inputFeedback [(int)MInputType.Redo] += delegate(InputArg arg) {
+			HistoryManager.Instance.Redo ();
+		};
+
 		objectFeedback[(int)MObjectEvent.UnitSettled] +=  delegate(ObjArg arg) {
 			UnitWindow.Instance.AddNextUnit ((Unit)arg.sender);
 		};
+
 
 	}
 
@@ -127,6 +154,8 @@ public class LogicManager : MBehavior
 	{
 		inputFeedback[(int)MInputType.Start] = null;
 		inputFeedback[(int)MInputType.Cancle] = null;
+		inputFeedback [(int)MInputType.Undo] = null;
+		inputFeedback [(int)MInputType.Redo] = null;
 		objectFeedback[(int)MObjectEvent.UnitSettled] = null;
 	}
 
@@ -259,7 +288,7 @@ public class LogicManager : MBehavior
 		case EditMode.Adding:
 		case EditMode.Running:
 			// rotate the camera
-			CameraControl.Instance.RotateCameraByScreenOffset (arg.offset * sensity.subMotionSensity, true);
+			CameraControl.Instance.RotateCameraByScreenOffset (arg.offset * sensity.SpinSensity, true);
 			break;
 		default:
 			break;
@@ -296,7 +325,7 @@ public class LogicManager : MBehavior
 		case EditMode.Editting:
 		case EditMode.Adding:
 		case EditMode.Running:
-			CameraControl.Instance.ChangeFieldOfView (arg.delta * sensity.spinSensity);
+			CameraControl.Instance.ChangeFieldOfView (arg.delta * sensity.ZoomSensity);
 			break;
 		default:
 			break;
@@ -306,8 +335,8 @@ public class LogicManager : MBehavior
 	void OnGUI ()
 	{
 		GUIStyle style = new GUIStyle ();
-		style.fontSize = 40;
-		style.normal.textColor = Color.blue;
+		style.fontSize = 22;
+		style.normal.textColor = Color.black;
 		GUILayout.Label ("Mode " + Mode, style);
 	}
 }

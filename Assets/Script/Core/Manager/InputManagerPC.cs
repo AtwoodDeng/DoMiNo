@@ -7,12 +7,15 @@ public class InputManagerPC : InputManager {
 
 	delegate void FuncHandler(); 
 	Dictionary<KeyCode,FuncHandler> keyBlendDict = new Dictionary<KeyCode, FuncHandler>();
+	Dictionary<KeyCode,FuncHandler> controlKeyBlend = new Dictionary<KeyCode, FuncHandler>();
 
 	protected override void MStart ()
 	{
 		base.MStart ();
 		keyBlendDict.Add(KeyCode.Space,SendStartRunning );
 		keyBlendDict.Add(KeyCode.Escape,SendCancle);
+		keyBlendDict.Add (KeyCode.Z, SendUndo);
+		keyBlendDict.Add (KeyCode.R, SendRedo);
 	}
 
 	public override bool GetScreenPos (out Vector2 screenPos)
@@ -32,6 +35,14 @@ public class InputManagerPC : InputManager {
 				keyBlendDict[k].Invoke();
 			}
 		}
+
+		foreach (KeyCode k in controlKeyBlend.Keys) {
+			if (Input.GetKeyDown (k) && (Input.GetKey (KeyCode.LeftControl) || Input.GetKey (KeyCode.RightControl))) {
+				controlKeyBlend [k].Invoke ();
+			}
+		}
+
+
 	}
 
 	void OnFingerDown(FingerDownEvent e )

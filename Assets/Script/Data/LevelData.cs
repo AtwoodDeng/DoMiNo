@@ -8,6 +8,7 @@ using UnityEditor;
 /// Scritable object for saving the level data
 /// </summary> 
 [CreateAssetMenu(fileName="LevelData",menuName="DoMiNo/Level",order = 1)]
+
 public class LevelData : ScriptableObject {
 
 	/// <summary>
@@ -35,12 +36,12 @@ public class LevelData : ScriptableObject {
 			Unit u = t.GetComponent<Unit>();
 
 			if ( u != null ) {
-				UnitData data = UnitData.GenerateData(u);
+				UnitData data = u.ToData ();
 				asset.unitList.Add(data);
 			}
 		}
 			
-		AssetDatabase.CreateAsset(asset, "Assets/Data/" + levelName +  ".asset");
+		AssetDatabase.CreateAsset(asset, Global.levelDataPath + levelName +  ".asset");
 		AssetDatabase.SaveAssets();
 
 		return asset;
@@ -48,6 +49,8 @@ public class LevelData : ScriptableObject {
 
 	public static void ReadData( string levelName )
 	{
+		if (string.IsNullOrEmpty (levelName))
+			levelName = "Default";
 		// remove the world 
 		GameObject.Destroy( Global.world.gameObject );
 
@@ -59,7 +62,7 @@ public class LevelData : ScriptableObject {
 		UnitPrefabMap map = AssetDatabase.LoadAssetAtPath( "Assets/Data/map.asset" , typeof(UnitPrefabMap)) as UnitPrefabMap;
 
 	
-		LevelData level = AssetDatabase.LoadAssetAtPath( "Assets/Data/" + levelName + ".asset" , typeof( LevelData )) as LevelData;
+		LevelData level = AssetDatabase.LoadAssetAtPath( Global.levelDataPath + levelName + ".asset" , typeof( LevelData )) as LevelData;
 
 		GameObject[] prefabs = new GameObject[System.Enum.GetNames(typeof(Unit.Type)).Length ];
 		foreach( UnitPrefabMap.TypePrefabPair pair in map.map)

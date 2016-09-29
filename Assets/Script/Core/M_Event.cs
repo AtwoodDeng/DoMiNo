@@ -16,6 +16,8 @@ public enum MInputType
 	Zoom,
 	Cancle,
 	Start,
+	Undo,
+	Redo,
 }
 
 /// <summary>

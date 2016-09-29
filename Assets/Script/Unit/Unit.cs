@@ -30,5 +30,9 @@ public class Unit : MBehavior {
 		m_unitID = data.unitID;
 	}
 
+	public virtual UnitData ToData()
+	{
+		return UnitData.GenerateData (this);
+	}
 
 }

@@ -5,11 +5,8 @@ using System;
 /// <summary>
 /// Unit data is scriptable object to record the information of the single object
 /// </summary>
-
 [System.Serializable]
 public class UnitData : System.Object {
-
-
 	/// <summary>
 	/// The type of the unit
 	/// </summary>
@@ -35,6 +32,17 @@ public class UnitData : System.Object {
 	/// </summary>
 	public Vector3 scale;
 
+	/// <summary>
+	/// A parameter of vector3
+	/// </summary>
+	public Vector3 V3Para;
+
+
+	/// <summary>
+	/// Generates the basic data of an unit.
+	/// </summary>
+	/// <returns>The data.</returns>
+	/// <param name="u">U.</param>
 	static public UnitData GenerateData( Unit u )
 	{
 		UnitData data = new UnitData();

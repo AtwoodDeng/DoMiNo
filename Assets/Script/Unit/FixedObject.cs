@@ -3,17 +3,9 @@ using System.Collections;
 
 public class FixedObject : EditableUnit {
 
-	public override void Confirm ()
+	public override void Settle ()
 	{
-		base.Confirm ();
-		gameObject.layer = LayerMask.NameToLayer ("Floor");
-		if (m_rigidbody != null)
-			m_rigidbody.isKinematic = true;
-	}
-
-	protected override void EnterSettled ()
-	{
-		base.EnterSettled ();
+		base.Settle ();
 		gameObject.layer = LayerMask.NameToLayer ("Floor");
 		if (m_rigidbody != null)
 			m_rigidbody.isKinematic = true;

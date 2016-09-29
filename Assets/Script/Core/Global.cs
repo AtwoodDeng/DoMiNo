@@ -16,4 +16,6 @@ public class Global {
 			return world.transform;
 		}
 	}
+
+	static public string levelDataPath = "Assets/Data/Level/";
 }

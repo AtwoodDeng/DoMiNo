@@ -26,6 +26,26 @@ public class InputManager : MBehavior {
 	}
 
 	/// <summary>
+	/// Sends the redo event .
+	/// </summary>
+	protected void SendRedo()
+	{
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.Redo;
+		M_Event.FireInput (arg);
+	}
+
+	/// <summary>
+	/// Sends the undo event .
+	/// </summary>
+	protected void SendUndo()
+	{
+		InputArg arg = new InputArg (this);
+		arg.type = MInputType.Undo;
+		M_Event.FireInput (arg);
+	}
+
+	/// <summary>
 	/// Sends the cancle event .
 	/// </summary>
 	protected void SendCancle()

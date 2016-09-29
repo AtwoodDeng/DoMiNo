@@ -37,6 +37,18 @@ public class Starter : Unit {
 	{
 		Gizmos.color = new Color (1f, 0.5f, 0);
 		Gizmos.DrawLine (transform.position, transform.position + pushDirection);
+	}
 
+	public override void Init (UnitData data)
+	{
+		base.Init (data);
+		pushDirection = data.V3Para;
+	}
+
+	public override UnitData ToData ()
+	{
+		UnitData data = base.ToData ();
+		data.V3Para = pushDirection;
+		return data;
 	}
 }
